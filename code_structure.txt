@@ -1,0 +1,114 @@
+VacPack Codebase Overview
+==========================
+
+This project provides a GUI-based control and monitoring system for a lab vacuum setup.
+It supports real-time data acquisition and control of:
+- Mass Flow Controller (MFC)
+- Pressure Gauge (PDR900)
+- Vacuum Pump (via Arduino)
+
+--------------------------------------
+PROJECT STRUCTURE
+--------------------------------------
+
+vacpack/
+│
+├── main.py
+│   - Entry point of the application.
+│   - Initializes dark mode, checks devices, launches GUI.
+│
+├── vacpack_gui.py
+│   - Defines the VacPackGUI class.
+│   - Main application window: organizes layout, buttons, displays, and real-time graphs.
+│   - Receives MFC, PDR900, and Pump instances from main.py.
+│
+├── build.bat
+│   - Windows batch script for building standalone .exe using PyInstaller.
+│
+├── vacpack.ico
+│   - Application icon used in the .exe build.
+│
+├── requirements.txt
+│   - Lists required Python packages.
+│
+├── DataReaderThread.py
+│   - Contains DataReaderThread (inherits from QThread).
+│   - Polls MFC and PDR900 once per second.
+│   - Emits flow and pressure values to the GUI.
+
+
+--------------------------------------
+FOLDERS
+--------------------------------------
+
+devices/
+│
+├── HttpMFC.py
+│   - HttpMFC class: communicates with MKS MFC via HTTP (Ethernet).
+│   - Provides methods:
+│       connect(), get_flow_rate(), get_pressure()
+
+├── pdr900.py
+│   - PDR900 class: communicates with PDR900 pressure gauge over USB (serial).
+│   - Provides methods:
+│       is_connected(), read_pressure(), close()
+
+├── vacuum_pump.py
+│   - VacuumPumpController class: toggles pump using an Arduino via serial.
+│   - Provides methods:
+│       is_connected(), toggle_pump(), read_status(), close()
+
+--------------------------------------
+CLASSES AND ROLES
+--------------------------------------
+
+VacPackGUI (vacpack_gui.py)
+- Inherits from QWidget
+- Draws all interface panels
+- Handles display updates for:
+  - Flow rate (from MFC)
+  - Pressure (from MFC)
+  - Pressure (from PDR900)
+  - Pump status
+- Starts DataReaderThread for polling
+
+HttpMFC (devices/HttpMFC.py)
+- Connects to MFC via HTTP
+- Methods:
+  - connect()            → Test HTTP connectivity
+  - get_flow_rate()      → Read current flow
+  - get_pressure()       → Read pressure from MFC
+
+PDR900 (devices/pdr900.py)
+- Reads pressure data via serial
+- Methods:
+  - is_connected()
+  - read_pressure()      → Returns float or None
+  - close()
+
+VacuumPumpController (devices/vacuum_pump.py)
+- Sends serial commands to toggle pump
+- Methods:
+  - toggle_pump()
+  - read_status()
+  - close()
+
+DataReaderThread (DataReaderThread.py)
+- QThread subclass
+- Loops every second and reads from MFC and PDR900
+- Emits signal: data_updated(flow, mfc_pressure, pdr_pressure)
+
+SystemInitializer (utils/system_initializer.py)
+- Class that attempts to connect to all devices before launching the GUI
+- Returns:
+  - status dictionary: {"MFC": True, "PDR900": False, ...}
+  - devices dictionary: {"MFC": HttpMFC(), ...}
+
+--------------------------------------
+NOTES
+--------------------------------------
+- Devices are passed into VacPackGUI rather than created inside.
+- Code is modular and designed for easy testing and extension.
+- Real-time plotting is handled using pyqtgraph.
+
+--------------------------------------
