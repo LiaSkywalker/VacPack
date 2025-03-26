@@ -1,4 +1,6 @@
 # VacPack: Vacuum and Gas Flow Lab Controller
+![image](https://github.com/user-attachments/assets/57a13417-8c28-43da-ab35-d9f38c9a5f0c)
+
 
 A Python-based desktop application to control and monitor:
 - ✅ Mass Flow Controller (MFC) over Ethernet
@@ -12,7 +14,6 @@ A Python-based desktop application to control and monitor:
 - 📉 Real-time plotting of MFC flow and pressure
 - 🧪 Live pressure display from PDR900
 - 🟢 Vacuum pump control with state indicator
-- 🚨 Emergency stop & safety handling
 - 💻 One-click desktop app (`.exe`) for Windows
 
 ---
